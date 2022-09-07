@@ -36,3 +36,12 @@ Calculer le nombre total de games
 
 Gérer les changements de noms (facile avec l'id Riot) et les stocker
 ```
+
+## ENDPoints utiles 
+```
+summoner-v4 https://developer.riotgames.com/apis#summoner-v4/ (id, icons, summoner lvl)
+league-v4 https://developer.riotgames.com/apis#league-v4/
+icones de profil : http://ddragon.leagueoflegends.com/cdn/12.17.1/img/profileicon/685.png
+
+https://developer.riotgames.com/docs/lol#data-dragon_data-assets
+ 
