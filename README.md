@@ -1,5 +1,5 @@
 # TODO
-
+```
 BDD
 Pour un utilisateur
 Pseudo IRL (un joueur peut avoir des smurfs)
@@ -35,3 +35,4 @@ Calculer le WR
 Calculer le nombre total de games
 
 Gérer les changements de noms (facile avec l'id Riot) et les stocker
+```
