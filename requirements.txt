@@ -1,0 +1,6 @@
+Django
+requests
+urllib3
+gunicorn
+whitenoise
+python-dotenv
