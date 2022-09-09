@@ -2,6 +2,7 @@ Django
 requests
 urllib3
 gunicorn
-whitenoise
+libpq-dev
+python3-dev
 psycopg2
 python-dotenv
