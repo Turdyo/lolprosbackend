@@ -147,3 +147,12 @@ def getTeamDb(team):
 
 def teamDb(request, team):
     return JsonResponse(getTeamDb(team))
+
+
+def players(request):
+    players = Player.objects.all()
+
+    response = {}
+
+    for player in players:
+        return
