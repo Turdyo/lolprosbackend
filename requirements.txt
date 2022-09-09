@@ -2,5 +2,6 @@ Django
 requests
 urllib3
 gunicorn
+whitenoise
 psycopg2-binary
 python-dotenv
