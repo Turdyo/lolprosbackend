@@ -16,9 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import RedirectView
+import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('lolpros/', include('lolpros.urls')),
-    path('', RedirectView.as_view(url="http://127.0.0.1:8000/lolpros/")),
+    path('', RedirectView.as_view(url=os.getenv('URL_REDIRECT'))),
 ]
