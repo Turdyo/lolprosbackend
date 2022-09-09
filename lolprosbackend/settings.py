@@ -78,19 +78,19 @@ WSGI_APPLICATION = "lolprosbackend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if os.getenv('DEBUG') == "True":
-    DATABASES = {
+if os.getenv('DEBUG') != None: 
+    DATABASES = { 
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-else:
+else: 
     DATABASES = {
-        'default': {
+        'default': { 
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.getenv('DB_NAME'),
-            'HOST': os.getenv('HOST'),
+            'HOST': os.getenv('HOST'), 
             'PORT': os.getenv('PORT'),
             'USER': os.getenv('USER'),
             'PASSWORD': os.getenv('PASSWORD'),
