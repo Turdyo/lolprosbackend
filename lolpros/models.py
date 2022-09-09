@@ -41,8 +41,11 @@ class Account(models.Model):
         return self.name
 
     def getLpc(self):
-        self.LPC = dico_tier[self.tier] + dico_rank[self.rank] + self.leaguePoints
-        return True
+        if self.tier != '':
+            self.LPC = dico_tier[self.tier] + dico_rank[self.rank] + self.leaguePoints
+            return True
+        self.LPC = 0
+        return False
 
 
 

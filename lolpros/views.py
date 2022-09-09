@@ -4,7 +4,6 @@ from django.http import HttpResponse, JsonResponse
 import requests
 import os
 from dotenv import load_dotenv, find_dotenv
-
 from lolpros.models import Account, Team, Player
 
 load_dotenv(find_dotenv())
@@ -25,9 +24,19 @@ def addAccount(request, account):
     res2 = requests.get(urlLp)
     res2 = res2.json()
 
-    for league in res2:
-        if league['queueType'] == "RANKED_SOLO_5x5":
-            res2 = league
+    if res2 != []:
+        for league in res2:
+            if league['queueType'] == "RANKED_SOLO_5x5":
+                res2 = league
+    else:
+        res2 = {
+            'tier': '',
+            'rank': '',
+            'leaguePoints': 0,
+            'wins': 0,
+            'losses': 0,
+        }
+
     res = res | res2
 
     try:
@@ -65,3 +74,76 @@ def addAccount(request, account):
         a.save()
 
     return JsonResponse(res)
+
+
+def getPlayerDb(player):
+    player = player.lower()
+
+    try:
+        playerInfos = Player.objects.get(name=player)
+
+    except Player.DoesNotExist:
+        response = {
+            "response": "Le joueur n'existe pas"
+        }
+        return response
+
+    accountsInfos = Account.objects.filter(player__name=player)
+
+    response = {
+        "playerId" : playerInfos.id,
+        "playerName" : playerInfos.name.capitalize(),
+        "playerTeam" : playerInfos.team.name.capitalize() if playerInfos.team else None,
+        "teamId" : playerInfos.team.id if playerInfos.team else None,
+        "accounts" : [],
+    }
+
+    for account in accountsInfos:
+        response['accounts'].append({
+            "playerId": playerInfos.id,
+            'name': account.name,
+            'summonerLvl': account.summonerLvl,
+            'profileIcon': account.profileIcon,
+            'tier': account.tier,
+            'rank': account.rank,
+            'leaguePoints': account.leaguePoints,
+            'wins': account.wins,
+            'losses': account.losses,
+            'LPC': account.LPC,
+        })
+    return response
+
+
+def playerDb(request, player):
+    return JsonResponse(getPlayerDb(player))
+
+
+def getTeamDb(team):
+    team = team.lower()
+
+    try:
+        teamInfos = Team.objects.get(name=team)
+
+    except Team.DoesNotExist:
+        response = {
+            "response": "La Team n'existe pas"
+        }
+        return JsonResponse(response)
+
+    playersInfos = Player.objects.filter(team__name=team)
+
+    response = {
+        "teamId" : teamInfos.id,
+        "teamName" : teamInfos.name.capitalize(),
+        "teamLogo" : teamInfos.logo,
+        "players" : [],
+    }
+
+    for player in playersInfos:
+        response['players'].append(getPlayerDb(player.name))
+
+    return response
+
+
+def teamDb(request, team):
+    return JsonResponse(getTeamDb(team))

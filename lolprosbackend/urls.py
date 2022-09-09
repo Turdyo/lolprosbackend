@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('lolpros/', include('lolpros.urls')),
+    path('', RedirectView.as_view(url="http://127.0.0.1:8000/lolpros/")),
 ]
