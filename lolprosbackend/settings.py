@@ -36,6 +36,7 @@ CSRF_TRUSTED_ORIGINS = ['https://api.4esport.fr']
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3030',
     'https://api.4esport.fr',
+    "https://lolpros.4esport.fr",
 ]
 
 
@@ -55,7 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
