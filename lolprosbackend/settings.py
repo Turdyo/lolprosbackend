@@ -37,6 +37,9 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3030',
     'https://api.4esport.fr',
     "https://lolpros.4esport.fr",
+    "http://localhost:3000",
+    "http://82.125.248.181",
+    "httsp://82.125.248.181",
 ]
 
 
