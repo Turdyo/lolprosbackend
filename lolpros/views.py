@@ -46,7 +46,7 @@ def addAccount(request, account):
             a.update(
                 name=res['name'], 
                 summonerLvl=res['summonerLevel'], 
-                profileIcon=f"http://ddragon.leagueoflegends.com/cdn/12.17.1/img/profileicon/{res['profileIconId']}.png",
+                profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.17.1/img/profileicon/{res['profileIconId']}.png",
                 tier=res['tier'],
                 rank=res['rank'],
                 leaguePoints=res['leaguePoints'],
@@ -63,7 +63,7 @@ def addAccount(request, account):
             id=res['id'],
             name=res['name'], 
             summonerLvl=res['summonerLevel'], 
-            profileIcon=f"http://ddragon.leagueoflegends.com/cdn/12.17.1/img/profileicon/{res['profileIconId']}.png",
+            profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.17.1/img/profileicon/{res['profileIconId']}.png",
             tier=res['tier'],
             rank=res['rank'],
             leaguePoints=res['leaguePoints'],
