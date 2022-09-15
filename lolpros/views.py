@@ -146,6 +146,10 @@ def getTeamDb(team):
 
     return response
 
+    # nom
+    # logo
+    # id
+    # liste des joueurs (meme infos que leaderboard)
 
 def teamDb(request, team):
     return JsonResponse(getTeamDb(team))
@@ -163,7 +167,7 @@ def leaderboard(request):
             players.append(account.player.name)
         else :
             accounts.remove(account)
-            
+
     response = {
         'response': []
     }
@@ -172,11 +176,12 @@ def leaderboard(request):
         player = {
             'name': account.player.name.capitalize() if account.player else None,
             'logo': account.profileIcon,
-            'role': account.player.role,
+            'role': account.player.role if account.player else None,
             'LPC': account.LPC,
+            'tier': account.tier,
             'rank': account.rank,
             'lp': account.leaguePoints,
-            'team': account.player.team.name if account.player.team else None,
+            'team': account.player.team.name.capitalize() if account.player.team else None,
             'teamLogo': account.player.team.logo if account.player.team else None,
         }
  
