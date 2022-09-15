@@ -4,7 +4,9 @@ from django.http import HttpResponse, JsonResponse
 import requests
 import os
 from dotenv import load_dotenv, find_dotenv
-from lolpros.models import Account, Team, Player
+from lolpros.models import Account, Team, Player, lpUpdate
+import datetime
+from django.utils.timezone import get_current_timezone
 
 load_dotenv(find_dotenv())
 
@@ -54,9 +56,19 @@ def addAccount(request, account):
                 losses=res['losses']
             )
             a = Account.objects.get(id=res['id'])
+
+            oldLPC = a.LPC
             a.getLpc()
             a.save()
             a.refresh_from_db()
+            
+            if oldLPC != a.LPC:
+                lp = lpUpdate(
+                    lp=a.LPC,
+                    date=datetime.datetime.now().replace(tzinfo=get_current_timezone()),
+                    account=a
+                )
+                lp.save()
             
     except Account.DoesNotExist:
         a = Account(
@@ -72,6 +84,14 @@ def addAccount(request, account):
         )
         a.getLpc()
         a.save()
+
+        lp = lpUpdate(
+            lp=a.LPC,
+            date=datetime.datetime.now().replace(tzinfo=get_current_timezone()),
+            account=a
+        )
+        lp.save()
+        
 
     return JsonResponse(res)
 
@@ -165,7 +185,7 @@ def getTeamDb(team):
 
     return response
 
-    # liste des joueurs (meme infos que leaderboard)
+
 
 def teamDb(request, team):
     return JsonResponse(getTeamDb(team))

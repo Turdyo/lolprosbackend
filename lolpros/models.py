@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 
 class Team(models.Model):
@@ -32,22 +33,37 @@ class Account(models.Model):
     losses = models.IntegerField(null=True, blank=True)
 
     LPC = models.IntegerField(null=True, blank=True)
-    LPHistory = models.TextField(null=True, blank=True)
-    nameHistory = models.TextField(null=True, blank=True)
 
-    
     player = models.ForeignKey(Player, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
+    def getLpHisto(self):
+        updates = list(lpUpdate.objects.filter(account=self))
+        updates.sort(key=lambda x:x.date)
+
+        response = []
+
+        for update in updates:
+            infos = {
+                'lp': update.lp,
+                'date': json.dumps(update.date.isoformat()),
+            }
+
+            response.append(infos)
+
+        return response
+
     def getLpc(self):
         if self.tier != '':
-            self.LPC = dico_tier[self.tier] + dico_rank[self.rank] + self.leaguePoints
+            if self.tier == 'MASTER' or self.tier == 'GRANDMASTER' or self.tier == 'CHALLENGER':
+                self.LPC = dico_tier[self.tier] + self.leaguePoints
+            else:
+                self.LPC = dico_tier[self.tier] + dico_rank[self.rank] + self.leaguePoints
             return True
         self.LPC = 0
         return False
-
 
 
 dico_tier = {
@@ -61,9 +77,20 @@ dico_tier = {
     "GRANDMASTER": 2900,
     "CHALLENGER": 3300,
 }
+
 dico_rank = {
     "IV": 0,
     "III": 100,
     "II": 200, 
     "I": 300
 }
+
+class lpUpdate(models.Model):
+    lp = models.IntegerField(null=True, blank=True)
+    date = models.DateTimeField(null=True, blank=True)
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+
+    def __str__(self):
+        return f"{self.lp} {self.account}"
