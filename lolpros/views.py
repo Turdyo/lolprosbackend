@@ -104,7 +104,7 @@ def getPlayerDb(player):
         response['accounts'].append({
             "playerId": playerInfos.id,
             'name': account.name,
-            'summonerLvl': account.summonerLvl,
+            'summonerLvl': account.summonerLvl, 
             'profileIcon': account.profileIcon,
             'tier': account.tier,
             'rank': account.rank,
@@ -151,10 +151,35 @@ def teamDb(request, team):
     return JsonResponse(getTeamDb(team))
 
 
-def players(request):
-    players = Player.objects.all()
 
-    response = {}
+def leaderboard(request):
+    accounts = list(Account.objects.all())
+    accounts.sort(key=lambda x:x.LPC, reverse=True)
 
-    for player in players:
-        return
+    players = []
+
+    for account in accounts:
+        if account.player.name not in players:
+            players.append(account.player.name)
+        else :
+            accounts.remove(account)
+            
+    response = {
+        'response': []
+    }
+
+    for account in accounts:
+        player = {
+            'name': account.player.name.capitalize() if account.player else None,
+            'logo': account.profileIcon,
+            'role': account.player.role,
+            'LPC': account.LPC,
+            'rank': account.rank,
+            'lp': account.leaguePoints,
+            'team': account.player.team.name if account.player.team else None,
+            'teamLogo': account.player.team.logo if account.player.team else None,
+        }
+ 
+        response['response'].append(player)
+
+    return JsonResponse(response)

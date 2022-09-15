@@ -11,7 +11,7 @@ class Team(models.Model):
 
 class Player(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
-
+    role = models.CharField(max_length=50, null=True, blank=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -34,6 +34,7 @@ class Account(models.Model):
     LPC = models.IntegerField(null=True, blank=True)
     LPHistory = models.TextField(null=True, blank=True)
     nameHistory = models.TextField(null=True, blank=True)
+
     
     player = models.ForeignKey(Player, on_delete=models.CASCADE, null=True, blank=True)
 
