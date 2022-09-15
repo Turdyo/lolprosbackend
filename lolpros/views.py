@@ -88,7 +88,9 @@ def getPlayerDb(player):
         }
         return response
 
-    accountsInfos = Account.objects.filter(player__name=player)
+    accountsInfos = list(Account.objects.filter(player__name=player))
+    accountsInfos.sort(key=lambda x:x.LPC, reverse=True)
+    
 
     response = {
         "playerId" : playerInfos.id,
