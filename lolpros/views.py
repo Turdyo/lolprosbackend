@@ -93,9 +93,10 @@ def getPlayerDb(player):
     
 
     response = {
-        "playerId" : playerInfos.id,
-        "playerName" : playerInfos.name.capitalize(),
-        "playerTeam" : playerInfos.team.name.capitalize() if playerInfos.team else None,
+        "id" : playerInfos.id,
+        "name" : playerInfos.name.capitalize(),
+        "role" : playerInfos.role,
+        "team" : playerInfos.team.name.capitalize() if playerInfos.team else None,
         "teamId" : playerInfos.team.id if playerInfos.team else None,
         "accounts" : [],
     }
@@ -108,7 +109,7 @@ def getPlayerDb(player):
             'profileIcon': account.profileIcon,
             'tier': account.tier,
             'rank': account.rank,
-            'leaguePoints': account.leaguePoints,
+            'LP': account.leaguePoints,
             'wins': account.wins,
             'losses': account.losses,
             'LPC': account.LPC,
@@ -135,20 +136,35 @@ def getTeamDb(team):
     playersInfos = Player.objects.filter(team__name=team)
 
     response = {
-        "teamId" : teamInfos.id,
-        "teamName" : teamInfos.name.capitalize(),
+        "id" : teamInfos.id,
+        "name" : teamInfos.name.capitalize(),
         "teamLogo" : teamInfos.logo,
         "players" : [],
     }
 
     for player in playersInfos:
-        response['players'].append(getPlayerDb(player.name))
+        playerIntermediaire = getPlayerDb(player.name)
+
+        playerAccountInfos = {
+            'name': playerIntermediaire['accounts'][0]['name'],
+            'logo': playerIntermediaire['accounts'][0]['profileIcon'],
+            'role': playerIntermediaire['role'],
+            'LPC': playerIntermediaire['accounts'][0]['LPC'],
+            'tier': playerIntermediaire['accounts'][0]['tier'],
+            'rank': playerIntermediaire['accounts'][0]['rank'],
+            'LP': playerIntermediaire['accounts'][0]['LP'],
+        }
+
+        del playerIntermediaire['accounts']
+
+        playerIntermediaire = playerIntermediaire | playerAccountInfos
+
+
+
+        response['players'].append(playerIntermediaire)
 
     return response
 
-    # nom
-    # logo
-    # id
     # liste des joueurs (meme infos que leaderboard)
 
 def teamDb(request, team):
@@ -180,7 +196,7 @@ def leaderboard(request):
             'LPC': account.LPC,
             'tier': account.tier,
             'rank': account.rank,
-            'lp': account.leaguePoints,
+            'LP': account.leaguePoints,
             'team': account.player.team.name.capitalize() if account.player.team else None,
             'teamLogo': account.player.team.logo if account.player.team else None,
         }
