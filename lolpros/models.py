@@ -26,7 +26,7 @@ class Player(models.Model):
         accounts = [player.getMainAccount() for player in players]
         accounts.sort(key=lambda x:x.LPC, reverse=True)
 
-        return accounts.index(self.getMainAccount()) + 1
+        return f"{accounts.index(self.getMainAccount()) + 1}/{len(players)}"
 
 
     def __str__(self):
