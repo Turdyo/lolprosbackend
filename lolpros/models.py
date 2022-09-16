@@ -15,6 +15,13 @@ class Player(models.Model):
     role = models.CharField(max_length=50, null=True, blank=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
 
+    def getMainAccount(self):
+        accounts =  list(Account.objects.filter(player=self))
+        accounts.sort(key=lambda x:x.LPC, reverse=True)
+
+        return accounts[0]
+
+
     def __str__(self):
         return self.name
 

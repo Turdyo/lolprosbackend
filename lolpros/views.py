@@ -151,7 +151,7 @@ def getTeamDb(team):
         response = {
             "response": "La Team n'existe pas"
         }
-        return JsonResponse(response)
+        return response
 
     playersInfos = Player.objects.filter(team__name=team)
 
@@ -178,9 +178,6 @@ def getTeamDb(team):
         del playerIntermediaire['accounts']
 
         playerIntermediaire = playerIntermediaire | playerAccountInfos
-
-
-
         response['players'].append(playerIntermediaire)
 
     return response
@@ -193,20 +190,10 @@ def teamDb(request, team):
 
 
 def leaderboard(request):
-    accounts = list(Account.objects.all())
+    players = list(Player.objects.all())
+
+    accounts = [player.getMainAccount() for player in players]
     accounts.sort(key=lambda x:x.LPC, reverse=True)
-
-    players = []
-
-    for account in accounts:
-
-        if account.player:
-            if account.player.name not in players:
-                players.append(account.player.name)
-            else:
-                accounts.remove(account)
-        else:
-            accounts.remove(account)
 
     response = {
         'response': []
