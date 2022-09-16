@@ -61,7 +61,7 @@ class Account(models.Model):
 
         for update in updates:
             infos = {
-                'lp': update.lp,
+                'LP': update.lp,
                 'date': update.date.isoformat(),
             }
 
