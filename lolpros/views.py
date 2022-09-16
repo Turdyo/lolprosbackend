@@ -199,9 +199,13 @@ def leaderboard(request):
     players = []
 
     for account in accounts:
-        if account.player.name not in players:
-            players.append(account.player.name)
-        else :
+
+        if account.player:
+            if account.player.name not in players:
+                players.append(account.player.name)
+            else:
+                accounts.remove(account)
+        else:
             accounts.remove(account)
 
     response = {
@@ -210,7 +214,7 @@ def leaderboard(request):
 
     for account in accounts:
         player = {
-            'name': account.player.name.capitalize() if account.player else None,
+            'name': account.player.name.capitalize() if account.player else account.name,
             'logo': account.profileIcon,
             'role': account.player.role if account.player else None,
             'LPC': account.LPC,
