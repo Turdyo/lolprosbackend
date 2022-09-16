@@ -96,6 +96,16 @@ def addAccount(request, account):
     return JsonResponse(res)
 
 
+def updateAll(request):
+    accounts = Account.objects.all()
+
+    for account in accounts:
+        requests.get(f"https://api.4esport.fr/lolpros/addaccount/{account.name}")
+        print(f"Update {account.name}")
+    return HttpResponse("accounts updated")
+    
+
+
 def getPlayerDb(player):
     player = player.lower()
 
@@ -133,6 +143,7 @@ def getPlayerDb(player):
             'wins': account.wins,
             'losses': account.losses,
             'LPC': account.LPC,
+            'LPHisto': account.getLpHisto(),
         })
     return response
 
@@ -167,7 +178,7 @@ def getTeamDb(team):
 
         playerAccountInfos = {
             'name': playerIntermediaire['accounts'][0]['name'],
-            'logo': playerIntermediaire['accounts'][0]['profileIcon'],
+            'profileIcon': playerIntermediaire['accounts'][0]['profileIcon'],
             'role': playerIntermediaire['role'],
             'LPC': playerIntermediaire['accounts'][0]['LPC'],
             'tier': playerIntermediaire['accounts'][0]['tier'],
@@ -202,7 +213,7 @@ def leaderboard(request):
     for account in accounts:
         player = {
             'name': account.player.name.capitalize() if account.player else account.name,
-            'logo': account.profileIcon,
+            'profileIcon': account.profileIcon,
             'role': account.player.role if account.player else None,
             'LPC': account.LPC,
             'tier': account.tier,

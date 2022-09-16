@@ -48,14 +48,14 @@ class Account(models.Model):
 
     def getLpHisto(self):
         updates = list(lpUpdate.objects.filter(account=self))
-        updates.sort(key=lambda x:x.date)
+        updates.sort(key=lambda x:x.date, reverse=True)
 
         response = []
 
         for update in updates:
             infos = {
                 'lp': update.lp,
-                'date': json.dumps(update.date.isoformat()),
+                'date': update.date.isoformat(),
             }
 
             response.append(infos)

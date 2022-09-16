@@ -8,4 +8,5 @@ urlpatterns = [
     path('player/<str:player>', views.playerDb, name='playerDb'),
     path('team/<str:team>', views.teamDb, name='teamDb'),
     path('leaderboard', views.leaderboard, name='leaderboard'),
+    path('updateall', views.updateAll, name='updateAll')
 ]
