@@ -21,6 +21,13 @@ class Player(models.Model):
 
         return accounts[0]
 
+    def getRankByRole(self):
+        players = list(Player.objects.filter(role=self.role))
+        accounts = [player.getMainAccount() for player in players]
+        accounts.sort(key=lambda x:x.LPC, reverse=True)
+
+        return accounts.index(self.getMainAccount()) + 1
+
 
     def __str__(self):
         return self.name

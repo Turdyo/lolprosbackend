@@ -126,6 +126,7 @@ def getPlayerDb(player):
         "id" : playerInfos.id,
         "name" : playerInfos.name.capitalize(),
         "role" : playerInfos.role,
+        "rankByRole": playerInfos.getRankByRole(),
         "team" : playerInfos.team.name.capitalize() if playerInfos.team else None,
         "teamId" : playerInfos.team.id if playerInfos.team else None,
         "accounts" : [],
