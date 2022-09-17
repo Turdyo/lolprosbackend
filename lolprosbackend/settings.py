@@ -40,6 +40,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://82.125.248.181",
     "httsp://82.125.248.181",
+    "http://37.187.183.64",
+    "https://37.187.183.64",
 ]
 
 
