@@ -127,7 +127,7 @@ def getPlayerDb(player):
     
 
     response = {
-        "name" : playerInfos.name.capitalize(),
+        "name" : playerInfos.name,
         "role" : playerInfos.role,
         "rankByRole": playerInfos.getRankByRole(),
         "team" : playerInfos.team.name.capitalize() if playerInfos.team else None,
@@ -156,7 +156,6 @@ def playerDb(request, player):
 
 
 def getTeamDb(team):
-
     try:
         teamInfos = Team.objects.get(name=team)
 
