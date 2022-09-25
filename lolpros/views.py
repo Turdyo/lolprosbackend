@@ -112,7 +112,6 @@ def updateAll(request):
 
 
 def getPlayerDb(player):
-
     try:
         playerInfos = Player.objects.get(name__iexact=player)
 
@@ -122,12 +121,12 @@ def getPlayerDb(player):
         }
         return response
 
+    print(playerInfos, player)
     accountsInfos = list(Account.objects.filter(player__name=player))
     accountsInfos.sort(key=lambda x:x.LPC, reverse=True)
     
 
     response = {
-        "id" : playerInfos.id,
         "name" : playerInfos.name.capitalize(),
         "role" : playerInfos.role,
         "rankByRole": playerInfos.getRankByRole(),
@@ -138,7 +137,6 @@ def getPlayerDb(player):
 
     for account in accountsInfos:
         response['accounts'].append({
-            "playerId": playerInfos.id,
             'name': account.name,
             'summonerLvl': account.summonerLvl, 
             'profileIcon': account.profileIcon,
