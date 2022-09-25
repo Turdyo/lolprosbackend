@@ -18,12 +18,17 @@ def index(request):
 def addAccount(request, account):
     api_key = os.getenv('RIOT_API_KEY')
     urlAccount = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{account}?api_key={api_key}"
-
     res = requests.get(urlAccount)
+
+    if res.status_code == 404:
+        return JsonResponse({'response' : 'Erreur de pseudo'})
+
     res = res.json()
     urlLp = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{res['id']}?api_key={api_key}"
 
     res2 = requests.get(urlLp)
+
+
     res2 = res2.json()
 
     if res2 != []:
@@ -107,10 +112,9 @@ def updateAll(request):
 
 
 def getPlayerDb(player):
-    player = player.lower()
 
     try:
-        playerInfos = Player.objects.get(name=player)
+        playerInfos = Player.objects.get(name__iexact=player)
 
     except Player.DoesNotExist:
         response = {
@@ -154,7 +158,6 @@ def playerDb(request, player):
 
 
 def getTeamDb(team):
-    team = team.lower()
 
     try:
         teamInfos = Team.objects.get(name=team)
@@ -227,3 +230,45 @@ def leaderboard(request):
         response['response'].append(player)
 
     return JsonResponse(response)
+
+
+def registerPlayer(request, discordId, userName, accounts, role, token):
+    if token != os.getenv('REGISTER_TOKEN'):
+        return JsonResponse({'response' : 'Access Denied + ratio'})
+
+    response = ""
+
+    try:
+        p = Player.objects.get(discordId = discordId)
+        response += f"Le joueur {p} existe déjà. "
+
+    except Player.DoesNotExist:
+        p = Player(
+            discordId=discordId,
+            name=userName,
+            role=role,
+        )
+        p.save()
+
+        response += f"Création de {p}. "
+
+
+    accounts = accounts.split(';')
+
+    for account in accounts:
+        try:
+            a = Account.objects.get(name__iexact = account)
+            response += f"Le compte {a} existe déjà. "
+
+        except Account.DoesNotExist:
+            addAccount(request, account=account)
+            a = Account.objects.filter(name__iexact = account)
+            a.update(
+                player=p
+            )
+            print(a)
+            a = Account.objects.get(name__iexact = account)
+            a.refresh_from_db()
+            response += f"Le compte {a} à été ajouté. "
+
+    return JsonResponse({'response': response})

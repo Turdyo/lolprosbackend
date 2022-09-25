@@ -11,13 +11,14 @@ class Team(models.Model):
 
 
 class Player(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
+    discordId = models.IntegerField(primary_key=True) 
+    name = models.CharField(max_length=150, null=True, blank=True)
     role = models.CharField(max_length=50, null=True, blank=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
 
     def getMainAccount(self):
-        accounts =  list(Account.objects.filter(player=self))
-        accounts.sort(key=lambda x:x.LPC, reverse=True)
+        accounts = list(Account.objects.filter(player=self))
+        accounts.sort(key=lambda x:x.LPC, reverse=True) 
 
         return accounts[0]
 
