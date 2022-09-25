@@ -121,8 +121,9 @@ def getPlayerDb(player):
         }
         return response
 
-    print(playerInfos, player)
-    accountsInfos = list(Account.objects.filter(player__name=player))
+    print(player, playerInfos, playerInfos.name)
+
+    accountsInfos = list(Account.objects.filter(player__name=playerInfos.name))
     accountsInfos.sort(key=lambda x:x.LPC, reverse=True)
     
 
@@ -213,7 +214,7 @@ def leaderboard(request):
 
     for account in accounts:
         player = {
-            'name': account.player.name.capitalize() if account.player else account.name,
+            'name': account.player.name if account.player else account.name,
             'profileIcon': account.profileIcon,
             'role': account.player.role if account.player else None,
             'LPC': account.LPC,
