@@ -11,7 +11,7 @@ class Team(models.Model):
 
 
 class Player(models.Model):
-    discordId = models.IntegerField(primary_key=True) 
+    discordId = models.BigIntegerField(primary_key=True) 
     name = models.CharField(max_length=150, null=True, blank=True)
     role = models.CharField(max_length=50, null=True, blank=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
