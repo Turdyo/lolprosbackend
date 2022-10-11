@@ -53,7 +53,7 @@ def addAccount(request, account):
             a.update(
                 name=res['name'], 
                 summonerLvl=res['summonerLevel'], 
-                profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.17.1/img/profileicon/{res['profileIconId']}.png",
+                profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.19.1/img/profileicon/{res['profileIconId']}.png",
                 tier=res['tier'],
                 rank=res['rank'],
                 leaguePoints=res['leaguePoints'],
@@ -270,3 +270,30 @@ def registerPlayer(request, discordId, userName, accounts, role, token):
             response += f"Le compte {a} à été ajouté. "
 
     return JsonResponse({'response': response})
+
+
+def getPlayerDiscord(request, discordID):
+
+    try:
+        player = Player.objects.get(discordId = discordID)
+
+    except Player.DoesNotExist:
+        return JsonResponse({
+            "response": "Aucun joueur associé a ce discordID" 
+        }, status=404)
+    
+    account = player.getMainAccount()
+
+    return JsonResponse({
+        'name': player.name,
+        'role': player.role,
+        'team': player.team,
+        'summonerLvl': account.summonerLvl,
+        'profileIcon': account.profileIcon,
+        'LPC': account.LPC,
+        'tier': account.tier,
+        'rank': account.rank,
+        'LP': account.leaguePoints,
+        'LPHisto': account.getLpHisto(),
+    }, status=200)
+    

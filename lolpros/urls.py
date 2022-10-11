@@ -10,4 +10,5 @@ urlpatterns = [
     path('leaderboard', views.leaderboard, name='leaderboard'),
     path('updateall', views.updateAll, name='updateAll'),
     path('register/<int:discordId>/<str:userName>/<str:accounts>/<str:role>/<str:token>', views.registerPlayer, name="registerPlayer"),
+    path('discordplayer/<int:discordID>', views.getPlayerDiscord, name='getPlayerDiscord'),
 ]
