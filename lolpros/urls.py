@@ -11,4 +11,5 @@ urlpatterns = [
     path('updateall', views.updateAll, name='updateAll'),
     path('register/<int:discordId>/<str:userName>/<str:accounts>/<str:role>/<str:token>', views.registerPlayer, name="registerPlayer"),
     path('discordplayer/<int:discordID>', views.getPlayerDiscord, name='getPlayerDiscord'),
+    path('lastupdates', views.last10Updates, name='last10Updates'),
 ]

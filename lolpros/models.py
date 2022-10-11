@@ -70,6 +70,11 @@ class Account(models.Model):
 
         return response
 
+    def getPreviousUpdate(self, update):
+        return lpUpdate.objects.filter(account = self).filter(date__lte=update.date).order_by("-date")[1]
+
+
+
     def getLpc(self):
         if self.tier != '':
             if self.tier == 'MASTER' or self.tier == 'GRANDMASTER' or self.tier == 'CHALLENGER':

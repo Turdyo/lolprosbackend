@@ -1,4 +1,5 @@
 from http.client import HTTPResponse
+import json
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import requests
@@ -297,3 +298,23 @@ def getPlayerDiscord(request, discordID):
         'LPHisto': account.getLpHisto(),
     }, status=200)
     
+
+def last10Updates(request):
+    updates = [lpUpdate for lpUpdate in lpUpdate.objects.order_by('-date')][:10]
+
+    if updates == []:
+        return JsonResponse({"response": "Pas de lpUpdate"}, status=501)
+
+    response = {"response" : []}
+
+    for update in updates:
+        previousUpdate = update.account.getPreviousUpdate(update)
+        diff = update.lp - previousUpdate.lp
+        print(diff)
+        response["response"].append({
+            "player": update.account.name,
+            "date": update.date.isoformat(),
+            "diff": diff,
+        })
+
+    return JsonResponse(response, status=200)
