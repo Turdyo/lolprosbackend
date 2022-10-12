@@ -1,3 +1,4 @@
+from operator import index
 from django.db import models
 import json
 
@@ -71,7 +72,10 @@ class Account(models.Model):
         return response
 
     def getPreviousUpdate(self, update):
-        return lpUpdate.objects.filter(account = self).filter(date__lte=update.date).order_by("-date")[1]
+        try:
+            return lpUpdate.objects.filter(account = self).filter(date__lte=update.date).order_by("-date")[1]
+        except IndexError:
+            return update
 
 
 

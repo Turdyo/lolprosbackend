@@ -309,6 +309,8 @@ def last10Updates(request):
 
     for update in updates:
         previousUpdate = update.account.getPreviousUpdate(update)
+        if update == previousUpdate:
+            continue
         diff = update.lp - previousUpdate.lp
         print(diff)
         response["response"].append({
