@@ -224,6 +224,8 @@ def leaderboard(request):
             'LP': account.leaguePoints,
             'team': account.player.team.name.capitalize() if account.player.team else None,
             'teamLogo': account.player.team.logo if account.player.team else None,
+            'LPHisto': account.getLpHisto(),
+
         }
  
         response['response'].append(player)
