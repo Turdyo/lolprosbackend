@@ -81,7 +81,7 @@ def addAccount(request, account):
             id=res['id'],
             name=res['name'], 
             summonerLvl=res['summonerLevel'], 
-            profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.17.1/img/profileicon/{res['profileIconId']}.png",
+            profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.19.1/img/profileicon/{res['profileIconId']}.png",
             tier=res['tier'],
             rank=res['rank'],
             leaguePoints=res['leaguePoints'],
