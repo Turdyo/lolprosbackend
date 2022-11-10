@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 from http.client import HTTPResponse
+import time
 
 import requests
 from django.http import HttpResponse, JsonResponse
@@ -62,6 +63,9 @@ def addAccount(request, account = None, id = None):
     
     elif id:
         resLp = fetchLp(id, api_key)
+        if resLp == {} : 
+            return JsonResponse({"response":"error in fetchLp"})
+            
         resAccount = fetchAccount(resLp["summonerName"], api_key)   
 
     data = resAccount | resLp
