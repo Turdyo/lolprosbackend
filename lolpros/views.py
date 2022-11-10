@@ -74,7 +74,7 @@ def addAccount(request, account = None, id = None):
             a.update(
                 name=data['name'], 
                 summonerLvl=data['summonerLevel'], 
-                profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.19.1/img/profileicon/{data['profileIconId']}.png",
+                profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.21.1/img/profileicon/{data['profileIconId']}.png",
                 tier=data['tier'],
                 rank=data['rank'],
                 leaguePoints=data['leaguePoints'],
@@ -350,8 +350,9 @@ def lp24hGains():
 
     for account in accounts:
         res.append({
-            "name" : account.name,
-            "gains": account.get24hGains()
+            "name" : account.player.name,
+            "gains": account.get24hGains(),
+            "profileIcon": account.profileIcon
         })
 
     res.sort(key=lambda x: x['gains'], reverse=True)
