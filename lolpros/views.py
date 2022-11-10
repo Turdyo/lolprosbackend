@@ -1,13 +1,16 @@
-from http.client import HTTPResponse
-import json
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-import requests
-import os
-from dotenv import load_dotenv, find_dotenv
-from lolpros.models import Account, Team, Player, lpUpdate
 import datetime
+import json
+import os
+from http.client import HTTPResponse
+
+import requests
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
+from django.utils import timezone
 from django.utils.timezone import get_current_timezone
+from dotenv import find_dotenv, load_dotenv
+
+from lolpros.models import Account, Player, Team, lpUpdate
 
 load_dotenv(find_dotenv())
 
@@ -16,52 +19,69 @@ def index(request):
     return HttpResponse("YES")
 
 
-def addAccount(request, account):
-    api_key = os.getenv('RIOT_API_KEY')
-    urlAccount = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{account}?api_key={api_key}"
-    res = requests.get(urlAccount)
+def fetchAccount(account, api_key):
+    url = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{account}?api_key={api_key}"
+    res = requests.get(url)
 
-    if res.status_code == 404:
-        return JsonResponse({'response' : 'Erreur de pseudo'})
+    if res.status_code != 200:
+        return {}
+
+    return res.json()
+
+
+def fetchLp(id, api_key):
+    url = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{id}?api_key={api_key}"
+    res = requests.get(url)
+
+    if res.status_code != 200:
+        return {}
 
     res = res.json()
-    urlLp = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{res['id']}?api_key={api_key}"
-
-    res2 = requests.get(urlLp)
-
-
-    res2 = res2.json()
-
-    if res2 != []:
-        for league in res2:
+    
+    if res != []:
+        for league in res:
             if league['queueType'] == "RANKED_SOLO_5x5":
-                res2 = league
-    else:
-        res2 = {
-            'tier': '',
-            'rank': '',
-            'leaguePoints': 0,
-            'wins': 0,
-            'losses': 0,
-        }
+                return league
 
-    res = res | res2
+    account = Account.objects.get(id=id)
+    return {
+        'summonerName': account.name,
+        'id' : id,
+        'tier': '',
+        'rank': '',
+        'leaguePoints': 0,
+        'wins': 0,
+        'losses': 0
+    }
+
+def addAccount(request, account = None, id = None):
+    api_key = os.getenv('RIOT_API_KEY')
+    if account:
+        resAccount = fetchAccount(account, api_key)
+        resLp = fetchLp(resAccount["id"], api_key)
+    
+    elif id:
+        resLp = fetchLp(id, api_key)
+        resAccount = fetchAccount(resLp["summonerName"], api_key)   
+
+    data = resAccount | resLp
+
 
     try:
-        if Account.objects.get(id=res['id']):
-            print(f"Le compte {res['name']} existe déja, mise à jour...")
-            a = Account.objects.filter(id=res['id'])
+        if Account.objects.get(id=data['id']):
+            print(f"Le compte {data['name']} existe déja, mise à jour...")
+            a = Account.objects.filter(id=data['id'])
             a.update(
-                name=res['name'], 
-                summonerLvl=res['summonerLevel'], 
-                profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.19.1/img/profileicon/{res['profileIconId']}.png",
-                tier=res['tier'],
-                rank=res['rank'],
-                leaguePoints=res['leaguePoints'],
-                wins=res['wins'],
-                losses=res['losses']
+                name=data['name'], 
+                summonerLvl=data['summonerLevel'], 
+                profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.19.1/img/profileicon/{data['profileIconId']}.png",
+                tier=data['tier'],
+                rank=data['rank'],
+                leaguePoints=data['leaguePoints'],
+                wins=data['wins'],
+                losses=data['losses']
             )
-            a = Account.objects.get(id=res['id'])
+            a = Account.objects.get(id=data['id'])
 
             oldLPC = a.LPC
             a.getLpc()
@@ -78,15 +98,15 @@ def addAccount(request, account):
             
     except Account.DoesNotExist:
         a = Account(
-            id=res['id'],
-            name=res['name'], 
-            summonerLvl=res['summonerLevel'], 
-            profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.19.1/img/profileicon/{res['profileIconId']}.png",
-            tier=res['tier'],
-            rank=res['rank'],
-            leaguePoints=res['leaguePoints'],
-            wins=res['wins'],
-            losses=res['losses']
+            id=data['id'],
+            name=data['name'], 
+            summonerLvl=data['summonerLevel'], 
+            profileIcon=f"https://ddragon.leagueoflegends.com/cdn/12.19.1/img/profileicon/{data['profileIconId']}.png",
+            tier=data['tier'],
+            rank=data['rank'],
+            leaguePoints=data['leaguePoints'],
+            wins=data['wins'],
+            losses=data['losses']
         )
         a.getLpc()
         a.save()
@@ -97,17 +117,16 @@ def addAccount(request, account):
             account=a
         )
         lp.save()
-        
-
-    return JsonResponse(res)
+    
+    return JsonResponse(data)
 
 
 def updateAll(request):
     accounts = Account.objects.all()
 
     for account in accounts:
-        requests.get(f"https://api.4esport.fr/lolpros/addaccount/{account.name}")
-        print(f"Update {account.name}")
+        print(f"Update {account.name}, id {account.id}")
+        addAccount(request, id=account.id)
     return HttpResponse("accounts updated")
     
 
@@ -322,3 +341,25 @@ def last10Updates(request):
         })
 
     return JsonResponse(response, status=200)
+
+
+def lp24hGains():
+    accounts = Account.objects.all()
+
+    res = []
+
+    for account in accounts:
+        res.append({
+            "name" : account.name,
+            "gains": account.get24hGains()
+        })
+
+    res.sort(key=lambda x: x['gains'], reverse=True)
+    return res
+
+
+def playerOfTheDay(request):
+    return JsonResponse(lp24hGains()[0], safe=False)
+
+def interOfTheDay(request):
+    return JsonResponse(lp24hGains()[-1], safe=False)

@@ -12,4 +12,6 @@ urlpatterns = [
     path('register/<int:discordId>/<str:userName>/<str:accounts>/<str:role>/<str:token>', views.registerPlayer, name="registerPlayer"),
     path('discordplayer/<int:discordID>', views.getPlayerDiscord, name='getPlayerDiscord'),
     path('lastupdates', views.last10Updates, name='last10Updates'),
+    path('potd', views.playerOfTheDay, name="playerOfTheDay"),
+    path('iotd', views.interOfTheDay, name="interOfTheDay"),
 ]

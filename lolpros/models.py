@@ -1,6 +1,5 @@
-from operator import index
 from django.db import models
-import json
+from django.utils import timezone
 
 
 class Team(models.Model):
@@ -58,7 +57,6 @@ class Account(models.Model):
     def getLpHisto(self):
         updates = list(lpUpdate.objects.filter(account=self))
         updates.sort(key=lambda x:x.date, reverse=True)
-
         response = []
 
         for update in updates:
@@ -66,9 +64,7 @@ class Account(models.Model):
                 'LP': update.lp,
                 'date': update.date.isoformat(),
             }
-
             response.append(infos)
-
         return response
 
     def getPreviousUpdate(self, update):
@@ -77,7 +73,14 @@ class Account(models.Model):
         except IndexError:
             return update
 
+    def get24hGains(self):
+        updates = list(lpUpdate.objects.filter(account=self).filter(date__gte=timezone.now() - timezone.timedelta(1)).order_by("-date"))
+        if updates != []:
+            first = updates[0].lp
+            last = updates[-1].lp
+            return first-last
 
+        return 0
 
     def getLpc(self):
         if self.tier != '':
@@ -114,7 +117,6 @@ class lpUpdate(models.Model):
     date = models.DateTimeField(null=True, blank=True)
 
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-
 
     def __str__(self):
         return f"{self.lp} {self.account}"
