@@ -339,7 +339,8 @@ def last10Updates(request):
         diff = update.lp - previousUpdate.lp
         print(diff)
         response["response"].append({
-            "player": update.account.name,
+            "account": update.account.name,
+            "name": update.account.player.name,
             "date": update.date.isoformat(),
             "diff": diff,
         })
