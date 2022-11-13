@@ -47,6 +47,9 @@ class Account(models.Model):
     wins = models.IntegerField(null=True, blank=True)
     losses = models.IntegerField(null=True, blank=True)
 
+    avgWins = models.IntegerField(default=0, null=True, blank=True)
+    avgLosses = models.IntegerField(default=0, null=True, blank=True)
+
     LPC = models.IntegerField(null=True, blank=True)
 
     player = models.ForeignKey(Player, on_delete=models.CASCADE, null=True, blank=True)
@@ -79,7 +82,6 @@ class Account(models.Model):
             first = updates[0].lp
             last = updates[-1].lp
             return first-last
-
         return 0
 
     def getLpc(self):
@@ -91,6 +93,43 @@ class Account(models.Model):
             return True
         self.LPC = 0
         return False
+
+    def getLpHistoDiff(self, nbGames = False):
+        if nbGames: 
+            updates = list(lpUpdate.objects.filter(account=self).order_by("-date")[:nbGames])
+        else:
+            updates = list(lpUpdate.objects.filter(account=self).order_by("-date"))
+        res = []
+        for update in updates:
+            previousUpdate = update.account.getPreviousUpdate(update)
+            if update == previousUpdate:
+                continue
+            diff = update.lp - previousUpdate.lp
+            res.append(diff)
+        return res
+        
+    def getAverageGains(self, nbGames = False):
+        updates = self.getLpHistoDiff(nbGames)
+        wins = [update for update in updates if update > 0]
+        losses = [update for update in updates if update < 0]
+
+        self.avgWins = round(sum(wins)/len(wins) if wins else 0)
+        self.avgLosses = round(sum(losses)/len(losses) if losses else 0)
+
+        return {
+            "avgWins": self.avgWins,
+            "avgLosses": self.avgLosses
+        }
+
+
+class lpUpdate(models.Model):
+    lp = models.IntegerField(null=True, blank=True)
+    date = models.DateTimeField(null=True, blank=True)
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.lp} {self.account}"
 
 
 dico_tier = {
@@ -111,12 +150,3 @@ dico_rank = {
     "II": 200, 
     "I": 300
 }
-
-class lpUpdate(models.Model):
-    lp = models.IntegerField(null=True, blank=True)
-    date = models.DateTimeField(null=True, blank=True)
-
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.lp} {self.account}"

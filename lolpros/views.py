@@ -91,6 +91,7 @@ def addAccount(request, account = None, id = None):
             a.getLpc()
             a.save()
             a.refresh_from_db()
+            a.getAverageGains(20)
             
             if oldLPC != a.LPC:
                 lp = lpUpdate(
@@ -99,6 +100,9 @@ def addAccount(request, account = None, id = None):
                     account=a
                 )
                 lp.save()
+                
+                a.save()
+                a.refresh_from_db()
             
     except Account.DoesNotExist:
         a = Account(
@@ -150,7 +154,6 @@ def getPlayerDb(player):
     accountsInfos = list(Account.objects.filter(player__name=playerInfos.name))
     accountsInfos.sort(key=lambda x:x.LPC, reverse=True)
     
-
     response = {
         "name" : playerInfos.name,
         "role" : playerInfos.role,
@@ -172,6 +175,8 @@ def getPlayerDb(player):
             'losses': account.losses,
             'LPC': account.LPC,
             'LPHisto': account.getLpHisto(),
+            'agvWins': account.avgWins,
+            'avgLosses': account.avgLosses
         })
     return response
 
@@ -248,7 +253,6 @@ def leaderboard(request):
             'team': account.player.team.name.capitalize() if account.player.team else None,
             'teamLogo': account.player.team.logo if account.player.team else None,
             'LPHisto': account.getLpHisto(),
-
         }
  
         response['response'].append(player)
@@ -337,7 +341,6 @@ def last10Updates(request):
         if update == previousUpdate:
             continue
         diff = update.lp - previousUpdate.lp
-        print(diff)
         response["response"].append({
             "account": update.account.name,
             "name": update.account.player.name,
